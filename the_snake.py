@@ -58,8 +58,7 @@ class GameObject:
         """Возвращает случайную позицию на игровом поле."""
         random_x = randint(0, GRID_WIDTH - 1) * GRID_SIZE
         random_y = randint(0, GRID_HEIGHT - 1) * GRID_SIZE
-        random_position = random_x, random_y
-        return random_position
+        return random_x, random_y
 
 
 class Apple(GameObject):
