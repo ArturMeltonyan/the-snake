@@ -9,6 +9,8 @@ import pygame
 # Константы для размеров поля и сетки:
 SCREEN_WIDTH, SCREEN_HEIGHT = 640, 480
 GRID_SIZE = 20
+
+# Количество клеток, помещающихся на игровом поле:
 GRID_WIDTH = SCREEN_WIDTH // GRID_SIZE
 GRID_HEIGHT = SCREEN_HEIGHT // GRID_SIZE
 
@@ -29,22 +31,22 @@ APPLE_COLOR = (255, 0, 0)
 SNAKE_COLOR = (0, 255, 0)
 ROCK_COLOR = (100, 100, 100)
 
-# Настройки оттенков:
-HUE_CHANGE_INTERVAL = 20
-HUE_MAX = 360
-BACKGROUND_SATURATION = 50
-BACKGROUND_VALUE = 50
-HSV_ALPHA = 100
-TEXT_SATURATION = 100
-TEXT_VALUE = 100
+# Настройки изменения оттенка фона:
+HUE_CHANGE_INTERVAL = 20  # Интервал изменения оттенка в миллисекундах
+HUE_MAX = 360  # Максимальное значение оттенка в HSV
+BACKGROUND_SATURATION = 50  # Насыщенность фонового цвета
+BACKGROUND_VALUE = 50  # Яркость фонового цвета
+HSV_ALPHA = 100  # Значение альфа-компонента цвета
+TEXT_SATURATION = 100  # Насыщенность цвета текста
+TEXT_VALUE = 100  # Яркость цвета текста
 
-# Координаты и размеры области счёта:
-SCORE_TEXT_X = 10
-SPEED_TEXT_Y = 10
-SCORE_TEXT_Y = 35
-BEST_SCORE_TEXT_Y = 60
-SCORE_PANEL_WIDTH = 150
-SCORE_PANEL_HEIGHT = 90
+# Координаты и размеры информационной панели:
+SCORE_TEXT_X = 10  # Горизонтальная координата начала всех надписей панели
+SPEED_TEXT_Y = 10  # Вертикальная координата надписи со скоростью
+SCORE_TEXT_Y = 35  # Вертикальная координата текущего счёта
+BEST_SCORE_TEXT_Y = 60  # Вертикальная координата лучшего результата
+SCORE_PANEL_WIDTH = 150  # Ширина области панели со счётом в пикселях
+SCORE_PANEL_HEIGHT = 90  # Высота области панели со счётом в пикселях
 
 # Настройка игрового окна:
 pygame.init()
@@ -218,6 +220,9 @@ def erase_cell(position):
 
 def draw_score(font, speed, score, best_score):
     """Обновляет панель со скоростью и счётом."""
+    screen.fill(
+        BOARD_BACKGROUND_COLOR, (0, 0, SCORE_PANEL_WIDTH, SCORE_PANEL_HEIGHT)
+    )
     current_time = pygame.time.get_ticks()
     hue = (current_time // HUE_CHANGE_INTERVAL) % HUE_MAX
     background_color = pygame.Color(0)
@@ -270,19 +275,18 @@ def main():
     while True:
         clock.tick(snake.speed)
         current_time = pygame.time.get_ticks()
-
         handle_keys(snake)
         snake.update_direction()
         snake.move()
-
         ate_apple = snake.get_head_position() == apple.position
+
         if ate_apple:
             snake.grow()
             score += 1
             apple.respawn(snake.positions + [rock.position])
-
         rock_moved = False
         old_rock_position = rock.position
+
         if current_time - last_rock_move > 5000:
             rock.respawn(snake.positions + [apple.position])
             last_rock_move = current_time
@@ -290,7 +294,6 @@ def main():
 
         if score > best_score:
             best_score = score
-
         collided = (
             snake.get_head_position() in snake.positions[1:]
             or snake.get_head_position() == rock.position
@@ -311,9 +314,9 @@ def main():
         if rock_moved:
             erase_cell(old_rock_position)
 
+        draw_score(font, snake.speed, score, best_score)
         apple.draw()
         rock.draw()
-        draw_score(font, snake.speed, score, best_score)
         snake.draw()
         pygame.display.update()
 
